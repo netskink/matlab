@@ -80,38 +80,16 @@ end
 
 
 
-% Pass two - clear up dupes.
-nextSearch=1;
-counter=1;
-FoundPalms2=zeros(1000,3);
-nomoretofind=false;
-while(true)
-    for i=nextSearch:1000
-        x=FoundPalms(i,1);
-        y=FoundPalms(i,2);
-        theError=FoundPalms(i,3);
-        if theError == 0
-            nomoretofind=true;
-            break;
-        end
-%        theRows=find(FoundPalms(:,1)<(x+5) & FoundPalms(:,1)>(x-5) & FoundPalms(:,3) ~= 0 )
-        theRows=find(FoundPalms(:,2)<(y+17) & FoundPalms(:,2)>(y-17) & FoundPalms(:,1)<(x+17) & FoundPalms(:,1)>(x-17) & FoundPalms(:,3) ~= 0 );
-        theMin=min(FoundPalms(theRows,3));
-        theLocalMin=find(FoundPalms(theRows,3)==theMin,1); % the index for local min
-        FoundPalms2(counter,:) = FoundPalms(theLocalMin+theRows(1),:);
-        counter=counter+1;
-        nextSearch=nextSearch+length(theRows(:));
-        break;
-    end
-    if nomoretofind == true
-        break;
-    end
-end
-
+%% Pass two - clear up dupes.
+% remove any zeros in src
+theRows=find(FoundPalms(:,3)==0);
+FoundPalms(theRows,:)=[];
+% remove the dupes
+FoundPalms2 = remove_dupes(FoundPalms,[17,17],'min');
 
 foundImage2=zeros(nRow,nCol);
 numPalmsFound = 0;
-for i= 1:1000
+for i= 1:length(FoundPalms2)
     theError=FoundPalms2(i,3);
     if theError ~= 0
         x=FoundPalms2(i,1);
@@ -121,6 +99,7 @@ for i= 1:1000
     end
 end
 
+%% Display results
 disp(['Number of palm trees found ',num2str(numPalmsFound)]);
 
 figure('Name','Frame 1');
